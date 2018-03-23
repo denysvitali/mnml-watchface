@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background">#000</color>
+    
+    <color name="primary">#4cd137</color>
+    <color name="accent">#f5f6fa</color>
+
+    <color name="digital_text">#4cd137</color>
+    <color name="digital_date">@color/accent</color>
+    <color name="ambient_mode_text">#e2e2e2</color>
+    <color name="ambient_mode_date">#878787</color>
+    <color name="seconds_color">@color/primary</color>
+    <color name="inactive_seconds">#333</color>
+    <color name="notification_count">@color/accent</color>
+    <color name="ambient_mode_notification_count">@color/ambient_mode_date</color>
+</resources>

@@ -3,6 +3,9 @@
 A minimal watchface for your Wear OS device
 
 ## Screenshots
+
+### General
+![General](./screenshots/wf_general.png)
 ### Green
 ![Green WatchFace](./screenshots/wf_green.png)
 ### Gold

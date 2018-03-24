@@ -1,11 +1,16 @@
 <resources>
     <string name="app_name">MNML Watchface</string>
     <string name="message">Watch face tapped</string>
-    <string name="my_digital_name">My Digital</string>
+    <string name="my_digital_name">MNML WF</string>
     <string name="title_activity_watch_config">WatchConfigActivity</string>
+    <string name="digital_config_name">MNML Watch Config</string>
+    <string name="digital_config_color_name">MNML Watch Color Config</string>
     <!--
     This string is used for square devices and overridden by hello_world in
     values-round/strings.xml for round devices.
     -->
     <string name="hello_world">Hello Square World!</string>
+    <string name="config_title">Config</string>
+    <string name="color_config_title">Color Config</string>
+    <string name="row_icon_content_description">Icon</string>
 </resources>

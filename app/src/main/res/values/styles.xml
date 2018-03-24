@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Green" parent="android:Theme">
+        <item name="background">#000</item>
+        <item name="primary">#4cd137</item>
+        <item name="accent">#f5f6fa</item>
+        <item name="digital_text">#4cd137</item>
+        <item name="digital_date">?attr/accent</item>
+        <item name="ambient_mode_text">#e2e2e2</item>
+        <item name="ambient_mode_date">#878787</item>
+        <item name="ambient_mode_notification_count">?attr/ambient_mode_date</item>
+        <item name="active_charge_seconds">?attr/primary</item>
+        <item name="seconds_color">#ff6767</item>
+        <item name="inactive_seconds">#333</item>
+        <item name="inactive_charge_seconds">#063d00</item>
+        <item name="notification_count">?attr/ambient_mode_text</item>
+    </style>
+
+    <style name="Red" parent="android:Theme">
+        <item name="background">#000</item>
+        <item name="primary">#e74c3c</item>
+        <item name="accent">#f5f6fa</item>
+        <item name="digital_text">#d13737</item>
+        <item name="digital_date">?attr/accent</item>
+        <item name="ambient_mode_text">#e2e2e2</item>
+        <item name="ambient_mode_date">#878787</item>
+        <item name="ambient_mode_notification_count">?attr/ambient_mode_date</item>
+        <item name="active_charge_seconds">?attr/primary</item>
+        <item name="seconds_color">#ff6767</item>
+        <item name="inactive_seconds">#333</item>
+        <item name="inactive_charge_seconds">#3d0000</item>
+        <item name="notification_count">?attr/ambient_mode_text</item>
+    </style>
+
+    <style name="Violet" parent="android:Theme">
+        <item name="background">#000</item>
+        <item name="primary">#9d00ff</item>
+        <item name="accent">#5528b4</item>
+        <item name="digital_text">?attr/primary</item>
+        <item name="notification_count">?attr/accent</item>
+        <item name="digital_date">?attr/accent</item>
+        <item name="ambient_mode_text">#e2e2e2</item>
+        <item name="ambient_mode_date">#878787</item>
+        <item name="ambient_mode_notification_count">?attr/ambient_mode_date</item>
+        <item name="active_charge_seconds">?attr/primary</item>
+        <item name="seconds_color">?attr/primary</item>
+        <item name="inactive_seconds">#333</item>
+        <item name="inactive_charge_seconds">#330546</item>
+    </style>
+
+    <style name="Blue" parent="android:Theme">
+        <item name="background">#000</item>
+        <item name="primary">#009aff</item>
+        <item name="accent">#3978a3</item>
+        <item name="digital_text">?attr/primary</item>
+        <item name="notification_count">?attr/accent</item>
+        <item name="digital_date">?attr/accent</item>
+        <item name="ambient_mode_text">#e2e2e2</item>
+        <item name="ambient_mode_date">#878787</item>
+        <item name="ambient_mode_notification_count">?attr/ambient_mode_date</item>
+        <item name="active_charge_seconds">?attr/primary</item>
+        <item name="seconds_color">?attr/primary</item>
+        <item name="inactive_seconds">#333</item>
+        <item name="inactive_charge_seconds">#1b415b</item>
+    </style>
+
+    <style name="Orange" parent="android:Theme">
+        <item name="background">#000</item>
+        <item name="primary">#e67e22</item>
+        <item name="accent">#d35400</item>
+        <item name="digital_text">?attr/primary</item>
+        <item name="notification_count">?attr/accent</item>
+        <item name="digital_date">?attr/accent</item>
+        <item name="ambient_mode_text">#e2e2e2</item>
+        <item name="ambient_mode_date">#878787</item>
+        <item name="ambient_mode_notification_count">?attr/ambient_mode_date</item>
+        <item name="active_charge_seconds">?attr/primary</item>
+        <item name="seconds_color">?attr/primary</item>
+        <item name="inactive_seconds">#333</item>
+        <item name="inactive_charge_seconds">#662901</item>
+    </style>
+
+
+    <style name="GreenSea" parent="android:Theme">
+        <item name="background">#000</item>
+        <item name="primary">#17cea9</item>
+        <item name="accent">#07a989</item>
+        <item name="digital_text">?attr/primary</item>
+        <item name="notification_count">?attr/accent</item>
+        <item name="digital_date">?attr/accent</item>
+        <item name="ambient_mode_text">#e2e2e2</item>
+        <item name="ambient_mode_date">#878787</item>
+        <item name="ambient_mode_notification_count">?attr/ambient_mode_date</item>
+        <item name="active_charge_seconds">?attr/primary</item>
+        <item name="seconds_color">?attr/primary</item>
+        <item name="inactive_seconds">#333</item>
+        <item name="inactive_charge_seconds">#0a5647</item>
+    </style>
+
+    <style name="Gold" parent="android:Theme">
+        <item name="background">#000</item>
+        <item name="primary">#d6b509</item>
+        <item name="accent">#b68712</item>
+        <item name="digital_text">?attr/primary</item>
+        <item name="notification_count">?attr/accent</item>
+        <item name="digital_date">?attr/accent</item>
+        <item name="ambient_mode_text">#e2e2e2</item>
+        <item name="ambient_mode_date">#878787</item>
+        <item name="ambient_mode_notification_count">?attr/ambient_mode_date</item>
+        <item name="active_charge_seconds">?attr/primary</item>
+        <item name="seconds_color">?attr/primary</item>
+        <item name="inactive_seconds">#333</item>
+        <item name="inactive_charge_seconds">#766231</item>
+    </style>
+</resources>

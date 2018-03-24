@@ -21,6 +21,29 @@
 
         <activity android:name="android.support.wearable.complications.ComplicationHelperActivity"/>
 
+        <meta-data
+                android:name=
+                        "com.google.android.wearable.watchface.wearableConfigurationAction"
+                android:value=
+                        "it.denv.mnmlwatchface.MyWatchFace.CONFIG_DIGITAL" />
+
+        <activity
+                android:name=".WatchConfigColorActivity"
+                android:label="@string/digital_config_color_name"/>
+
+        <activity
+                android:name=".WatchConfigActivity"
+                android:label="@string/digital_config_name">
+            <intent-filter>
+                <action android:name=
+                                "it.denv.mnmlwatchface.MyWatchFace.CONFIG_DIGITAL" />
+                <category android:name=
+                                  "com.google.android.wearable.watchface.category.WEARABLE_CONFIGURATION" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+
         <service
                 android:name=".MyWatchFace"
                 android:label="@string/my_digital_name"
@@ -35,10 +58,17 @@
                     android:name="com.google.android.wearable.watchface.preview_circular"
                     android:resource="@drawable/preview_digital_circular"/>
 
+            <meta-data
+                    android:name=
+                            "com.google.android.wearable.watchface.wearableConfigurationAction"
+                    android:value=
+                            "it.denv.mnmlwatchface.MyWatchFace.CONFIG_DIGITAL" />
+
+
             <intent-filter>
                 <action android:name="android.service.wallpaper.WallpaperService"/>
-
                 <category android:name="com.google.android.wearable.watchface.category.WATCH_FACE"/>
+                <category android:name="it.denv.mnmlwatchface.THEME_CHANGED"/>
             </intent-filter>
         </service>
 
@@ -49,11 +79,6 @@
         <uses-library
                 android:name="com.google.android.wearable"
                 android:required="true"/>
-
-        <activity
-                android:name=".WatchConfigActivity"
-                android:label="@string/title_activity_watch_config">
-        </activity>
     </application>
 
 </manifest>

@@ -10,7 +10,7 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.ContextCompat;
+import android.support.annotation.ColorInt;
 import android.support.wearable.complications.ComplicationData;
 import android.support.wearable.complications.SystemProviders;
 import android.support.wearable.watchface.CanvasWatchFaceService;
@@ -20,6 +20,10 @@ import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
+import it.denv.mnmlwatchface.events.MessageEvent;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
@@ -55,6 +59,8 @@ public class MyWatchFace extends CanvasWatchFaceService {
     private static final int RIGHT_DIAL_COMPLICATION = 1;
 
     public static final int[] COMPLICATION_IDS = {LEFT_DIAL_COMPLICATION, RIGHT_DIAL_COMPLICATION};
+    
+    public static final String THEME_CHANGED = "it.denv.mnmlwatchface.THEME_CHANGED";
 
     // Left and right dial supported types.
     public static final int[][] COMPLICATION_SUPPORTED_TYPES = {
@@ -88,7 +94,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
         }
     }
 
-    private class Engine extends CanvasWatchFaceService.Engine {
+    public class Engine extends CanvasWatchFaceService.Engine {
 
         private int batteryLevel = -1;
         private final Handler mUpdateTimeHandler = new EngineHandler(this);
@@ -110,17 +116,36 @@ public class MyWatchFace extends CanvasWatchFaceService {
                 batteryLevel = (int) (batteryPct * 100);
             }
         };
+        private final BroadcastReceiver mThemeReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d(TAG, "Got a theme event!");
+                applyTheme(intent.getIntExtra("theme", R.style.Green));
+            }
+        };
+
+        @Subscribe(threadMode = ThreadMode.MAIN)
+        public void onMessageEvent(MessageEvent event) {
+            Log.d(TAG, "Message Event" + event.name);
+            if(event.name.equals("theme")) {
+                applyTheme(event.value);
+            }
+        };
+        
         private boolean mRegisteredTimeZoneReceiver = false;
         private boolean mRegisteredBatteryReceiver = false;
+        private boolean mRegisteredThemeReceiver = false;
         private float mXOffset;
         private float mYOffset;
         private Paint mBackgroundPaint;
         private Paint mTextPaint;
         private Paint mDatePaint;
-        private Paint mSecondsPaint;
+        private Paint activeChargeSecondsPaint;
         private Paint activeSecondsPaint;
         private Paint inactiveSecondsPaint;
+        private Paint inactiveChargeSecondsPaint;
         private Paint mNotificationCountPaint;
+        private int mCurrentTheme = R.style.Green;
 
         // Complications
         private Paint mComplicationPaint;
@@ -134,65 +159,104 @@ public class MyWatchFace extends CanvasWatchFaceService {
         private boolean mLowBitAmbient;
         private boolean mBurnInProtection;
         private boolean mAmbient;
+        private Resources.Theme mTheme;
 
         @Override
         public void onCreate(SurfaceHolder holder) {
             super.onCreate(holder);
+            setTheme(R.style.Red);
+            mTheme = getTheme();
+            mTheme.applyStyle(R.style.Red, false);
+            
             Resources resources = MyWatchFace.this.getResources();
 
             setWatchFaceStyle(new WatchFaceStyle.Builder(MyWatchFace.this)
                     .setAcceptsTapEvents(true)
-                    .setAccentColor(ContextCompat.getColor(getApplicationContext(), R.color.accent))
+                    .setAccentColor(getCustomColor(R.attr.accent))
                     .build());
 
             mCalendar = Calendar.getInstance();
-
             mYOffset = resources.getDimension(R.dimen.digital_y_offset);
-
-            // Initializes background.
-            mBackgroundPaint = new Paint();
-            mBackgroundPaint.setColor(
-                    ContextCompat.getColor(getApplicationContext(), R.color.background));
-
-
-            // Initializes Watch Face.
-            mTextPaint = new Paint();
-            mTextPaint.setTypeface(NORMAL_TYPEFACE);
-            mTextPaint.setAntiAlias(true);
-            mTextPaint.setColor(
-                    ContextCompat.getColor(getApplicationContext(), R.color.digital_text));
             
-            mDatePaint = new Paint();
-            mDatePaint.setTypeface(Typeface.SANS_SERIF);
-            mDatePaint.setColor(
-                    ContextCompat.getColor(getApplicationContext(), R.color.digital_date));
-
-            mSecondsPaint = new Paint();
-            mSecondsPaint.setTypeface(Typeface.SANS_SERIF);
-            mSecondsPaint.setColor(
-                    ContextCompat.getColor(getApplicationContext(), R.color.digital_date));
-
-            activeSecondsPaint = new Paint();
-            activeSecondsPaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.seconds_color));
-            activeSecondsPaint.setStrokeWidth(1);
-            activeSecondsPaint.setAntiAlias(true);
-
-            inactiveSecondsPaint = new Paint();
-            inactiveSecondsPaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.inactive_seconds));
-            inactiveSecondsPaint.setStrokeWidth(1);
-            inactiveSecondsPaint.setAntiAlias(true);
-
-            mNotificationCountPaint = new Paint();
-            mNotificationCountPaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.notification_count));
-            mNotificationCountPaint.setStrokeWidth(1);
-            mNotificationCountPaint.setAntiAlias(true);
-            mTextPaint.setTypeface(NORMAL_TYPEFACE);
-            mNotificationCountPaint.setTextSize(resources.getDimension(R.dimen.notification_count_size));
+            applyTheme(R.style.Gold);
+            createPaint();
             
             setDefaultSystemComplicationProvider(1, SystemProviders.DATE, ComplicationData.TYPE_RANGED_VALUE);
             registerReceiver();
             initializeComplications();
             
+        }
+
+        private void createPaint() {
+            Resources resources = getApplicationContext().getResources();
+
+            mBackgroundPaint = new Paint();
+            mBackgroundPaint.setColor(
+                    getCustomColor(R.attr.background)
+            );
+
+
+            float textSize = 0;
+            float dateSize = 0;
+            if(mTextPaint != null){
+                textSize = mTextPaint.getTextSize();
+            }
+
+            if(mDatePaint != null){
+                dateSize = mDatePaint.getTextSize();
+            }
+            
+            // Initializes Watch Face.
+            mTextPaint = new Paint();
+            mTextPaint.setTypeface(NORMAL_TYPEFACE);
+            mTextPaint.setAntiAlias(true);
+            mTextPaint.setColor(
+                    getCustomColor(R.attr.digital_text)
+            );
+            mTextPaint.setTextSize(textSize);
+
+            mDatePaint = new Paint();
+            mDatePaint.setTypeface(Typeface.SANS_SERIF);
+            mDatePaint.setAntiAlias(true);
+            mDatePaint.setColor(
+                    getCustomColor(R.attr.digital_date)
+            );
+            mDatePaint.setTextSize(dateSize);
+
+            activeChargeSecondsPaint = new Paint();
+            activeChargeSecondsPaint.setAntiAlias(true);
+            activeChargeSecondsPaint.setColor(
+                    getCustomColor(R.attr.active_charge_seconds)
+            );
+
+            activeSecondsPaint = new Paint();
+            activeSecondsPaint.setAntiAlias(true);
+            activeSecondsPaint.setColor(
+                    getCustomColor(R.attr.seconds_color)
+            );
+            activeSecondsPaint.setStrokeWidth(1);
+
+            inactiveSecondsPaint = new Paint();
+            inactiveSecondsPaint.setAntiAlias(true);
+            inactiveSecondsPaint.setColor(
+                    getCustomColor(R.attr.inactive_seconds)
+            );
+            inactiveSecondsPaint.setStrokeWidth(1);
+
+            inactiveChargeSecondsPaint = new Paint();
+            inactiveChargeSecondsPaint.setAntiAlias(true);
+            inactiveChargeSecondsPaint.setColor(
+                    getCustomColor(R.attr.inactive_charge_seconds)
+            );
+
+            mNotificationCountPaint = new Paint();
+            mNotificationCountPaint.setTypeface(Typeface.SANS_SERIF);
+            mNotificationCountPaint.setAntiAlias(true);
+            mNotificationCountPaint.setColor(
+                    getCustomColor(R.attr.notification_count)
+            );
+            mNotificationCountPaint.setStrokeWidth(1);
+            mNotificationCountPaint.setTextSize(resources.getDimension(R.dimen.notification_count_size));
         }
 
         private void initializeComplications() {
@@ -248,8 +312,7 @@ public class MyWatchFace extends CanvasWatchFaceService {
         private void registerReceiver() {
             registerTimeZoneReceiver();
             registerBatteryReceiver();
-            
-            
+            registerThemeReceiver();
         }
         
         private void registerTimeZoneReceiver(){
@@ -270,9 +333,18 @@ public class MyWatchFace extends CanvasWatchFaceService {
             MyWatchFace.this.registerReceiver(mBatteryLevelReceiver, filter);
         }
 
+        private void registerThemeReceiver(){
+            if (mRegisteredThemeReceiver) {
+                return;
+            }
+            mRegisteredThemeReceiver = true;
+            EventBus.getDefault().register(this);
+        }
+
         private void unregisterReceiver() {
             unregisterTimeZoneReceiver();
             unregisterBatteryReceiver();
+            //unregisterThemeReceiver();
         }
 
         private void unregisterTimeZoneReceiver() {
@@ -290,6 +362,14 @@ public class MyWatchFace extends CanvasWatchFaceService {
             mRegisteredBatteryReceiver = false;
             MyWatchFace.this.unregisterReceiver(mBatteryLevelReceiver);
         }
+        
+        private void unregisterThemeReceiver() {
+            if (!mRegisteredThemeReceiver) {
+                return;
+            }
+            mRegisteredThemeReceiver = false;
+            EventBus.getDefault().unregister(this);
+        }
 
         @Override
         public void onApplyWindowInsets(WindowInsets insets) {
@@ -305,7 +385,6 @@ public class MyWatchFace extends CanvasWatchFaceService {
 
             mTextPaint.setTextSize(textSize);
             mDatePaint.setTextSize(resources.getDimension(R.dimen.date_size));
-            mSecondsPaint.setTextSize(resources.getDimension(R.dimen.seconds_size));
         }
 
         @Override
@@ -367,20 +446,43 @@ public class MyWatchFace extends CanvasWatchFaceService {
         {
             mComplicationsY = (int) ((height / 2) + (mComplicationPaint.getTextSize() / 2));
         }
+        
+        public @ColorInt
+        int getCustomColor(int id){
+            TypedValue typedValue = new TypedValue();
+            mTheme.resolveAttribute(id, typedValue, true);
+            return typedValue.data;
+        }
+
+
+        private void applyTheme(int theme) {
+            mCurrentTheme = theme;
+            mTheme.applyStyle(theme, true);
+            createPaint();
+        }
 
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
+
+            /*if(mCurrentTheme == R.style.Green){
+                applyTheme(R.style.Red);
+            } else {
+                applyTheme(R.style.Green);
+            }*/
+            
             // Draw the background.
             if (isInAmbientMode()) {
                 canvas.drawColor(Color.BLACK);
-                mTextPaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.ambient_mode_text));
-                mDatePaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.ambient_mode_date));
-                mNotificationCountPaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.ambient_mode_notification_count));
+                mTextPaint.setColor(getCustomColor(R.attr.ambient_mode_text));
+                mDatePaint.setColor(getCustomColor(R.attr.ambient_mode_date));
+                mNotificationCountPaint.setColor(
+                        getCustomColor(R.attr.ambient_mode_notification_count)
+                );
             } else {
                 canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
-                mTextPaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.digital_text));
-                mDatePaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.digital_date));
-                mNotificationCountPaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.notification_count));
+                mTextPaint.setColor(getCustomColor(R.attr.digital_text));
+                mDatePaint.setColor(getCustomColor(R.attr.digital_date));
+                mNotificationCountPaint.setColor(getCustomColor(R.attr.notification_count));
             }
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
@@ -392,8 +494,12 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     mCalendar.get(Calendar.MINUTE))
                     : String.format("%d:%02d:%02d", mCalendar.get(Calendar.HOUR),
                     mCalendar.get(Calendar.MINUTE), mCalendar.get(Calendar.SECOND));*/
+            
+            int hour = mCalendar.get(Calendar.HOUR);
+            hour = hour == 0 ? 12 : hour;
+            
             String month = new SimpleDateFormat("MMM dd").format(mCalendar.getTime());
-            String text = String.format("%d:%02d", mCalendar.get(Calendar.HOUR), mCalendar.get(Calendar.MINUTE));
+            String text = String.format("%d:%02d", hour, mCalendar.get(Calendar.MINUTE));
             String date = month;
             String seconds_text = String.format("%02d", mCalendar.get(Calendar.SECOND));
             int seconds_now = mCalendar.get(Calendar.SECOND);
@@ -436,7 +542,12 @@ public class MyWatchFace extends CanvasWatchFaceService {
                     double angle =  - 2 * Math.PI / 59 * i + Math.PI;
                     float x = (float) (radius * Math.sin(angle));
                     float y = (float) (radius * Math.cos(angle));
-                    canvas.drawCircle(bounds.centerX() + x,bounds.centerY() + y, 5, seconds_now >= i ? activeSecondsPaint : inactiveSecondsPaint);
+                    canvas.drawCircle(bounds.centerX() + x,bounds.centerY() + y, 5, 
+                            seconds_now >= i ? 
+                                    (batteryLevel*60/100 >= i ? activeChargeSecondsPaint : activeSecondsPaint) 
+                                    : 
+                                    ((batteryLevel*60/100 >= i) ? inactiveChargeSecondsPaint : inactiveSecondsPaint)
+                    );
                 }
             }
 

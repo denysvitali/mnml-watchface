@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="background" format="reference|color"/>
+    <attr name="primary" format="reference|color"/>
+    <attr name="accent" format="reference|color"/>
+    <attr name="digital_text" format="reference|color"/>
+    <attr name="digital_date" format="reference|color"/>
+    <attr name="ambient_mode_text" format="reference|color"/>
+    <attr name="ambient_mode_date" format="reference|color"/>
+    <attr name="active_charge_seconds" format="reference|color"/>
+    <attr name="seconds_color" format="reference|color"/>
+    <attr name="inactive_seconds" format="reference|color"/>
+    <attr name="inactive_charge_seconds" format="reference|color"/>
+    <attr name="notification_count" format="reference|color"/>
+    <attr name="ambient_mode_notification_count" format="reference|color"/>
+</resources>

@@ -11,3 +11,5 @@ A minimal watchface for your Wear OS device
 ![Orange WatchFace](./screenshots/wf_orange.png)
 ### GreenSea
 ![GreenSea WatchFace](./screenshots/wf_greensea.png)
+### Blue
+![Blue WatchFace](./screenshots/wf_blue.png)
